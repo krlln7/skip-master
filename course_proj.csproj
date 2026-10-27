@@ -18,4 +18,11 @@
   </None>
 </ItemGroup>
 
+  <ItemGroup>
+    <Compile          Remove="proj_tests/**" />
+    <Content          Remove="proj_tests/**" />
+    <None             Remove="proj_tests/**" />
+    <EmbeddedResource Remove="proj_tests/**" />
+  </ItemGroup>
+
 </Project>

@@ -1,3 +1,6 @@
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("proj_tests")]
 class Student : IReadOnlyStudentHistory
 {
     const byte SatisfactionPoint = 1;
@@ -12,11 +15,11 @@ class Student : IReadOnlyStudentHistory
 
     public Subject LastSubject { get; set; }
 
-    public Student(IStrategy strategy)
+    public Student(IStrategy strategy, int semSays = 100)
     {
         _strategy = strategy;
-        DaysWasAsked = new bool?[University.SemesterDays, Enum.GetValues<Subject>().Length];
-        DaysPresent = new bool[University.SemesterDays, Enum.GetValues<Subject>().Length];
+        DaysWasAsked = new bool?[semSays, Enum.GetValues<Subject>().Length];
+        DaysPresent = new bool[semSays, Enum.GetValues<Subject>().Length];
     }
 
     public void DoDay(int day)

@@ -23,7 +23,9 @@ class University
             Classes = classes;
         }
 
-        Student = new Student(strategy);
+        SemesterDays = semDays;
+
+        Student = new Student(strategy, semDays);
     }
 
     // dropped out or not today?
