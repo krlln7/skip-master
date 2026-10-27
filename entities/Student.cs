@@ -10,11 +10,13 @@ class Student : IReadOnlyStudentHistory
     public bool?[,] DaysWasAsked { get; set; }
     public bool[,] DaysPresent { get; set; }
 
+    public Subject LastSubject { get; set; }
+
     public Student(IStrategy strategy)
     {
         _strategy = strategy;
-        DaysWasAsked = new bool?[University.SemesterDays, 6];
-        DaysPresent = new bool[University.SemesterDays, 6];
+        DaysWasAsked = new bool?[University.SemesterDays, Enum.GetValues<Subject>().Length];
+        DaysPresent = new bool[University.SemesterDays, Enum.GetValues<Subject>().Length];
     }
 
     public void DoDay(int day)
@@ -26,7 +28,7 @@ class Student : IReadOnlyStudentHistory
         for (int i = 0; i < skipChoice.Length; i++)
         {
             // Console.WriteLine("I will " + "[" + skipChoice[i] + "] to " + (Subject)i);
-            if (skipChoice[i])
+            if (!skipChoice[i])
             {
                 Satisfaction += SatisfactionPoint;
                 DaysPresent[day, i] = false;

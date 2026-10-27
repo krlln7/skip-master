@@ -1,8 +1,8 @@
 class ARule : IRule
 {
-    public bool Decide(int day, Student student, Lesson klass)
+    public bool Decide(int day, IReadOnlyStudentHistory history, Lesson klass)
     {
         if (day == 0) return false;
-        return student.DaysWasAsked[day - 1, (int)klass.subject] == true ? true : false;
+        return history.WasAsked(day - 1, klass.SubjectA) == true ? true : false;
     }
 }

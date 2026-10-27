@@ -20,6 +20,7 @@ class LoggerProgressReporter : IProgressReporter
         if (student.Satisfaction == 0)
         {
             _logger.LogInformation("Semester finished after {Days} days.", day);
+            _logger.LogInformation("Student was killed by " + Enum.GetName(typeof(Subject), student.LastSubject));
         }
     }
 }

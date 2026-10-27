@@ -2,8 +2,8 @@ using System.Diagnostics.CodeAnalysis;
 
 class Lesson
 {
-    public Subject subjectA { get; }
-    public Subject subjectB { get; }
+    public Subject SubjectA { get; }
+    public Subject SubjectB { get; }
 
     private static readonly Type[] RuleTypes =
     typeof(IRule).Assembly
@@ -12,7 +12,7 @@ class Lesson
         .ToArray();
     public required IRule rule;
 
-    public required Subject subject { get; init; }
+    public required Subject Subject { get; init; }
 
     [SetsRequiredMembers]
     public Lesson(Subject subj)
@@ -20,28 +20,31 @@ class Lesson
         var ruleType = TypesResolver.ResolveRandomly<IRule>();
         rule = (IRule)Activator.CreateInstance(ruleType)!;
 
-        subject = subj;
+        Subject = subj;
 
         if (rule is ABRule || rule is ARule)
         {
-            subjectA = (Subject)Random.Shared.Next(6);
-            subjectB = (Subject)Random.Shared.Next(6);
-
-            subjectA = subjectA == subjectB ? subject : subjectA;
+            int subjNum = Enum.GetValues<Subject>().Length;
+            SubjectA = (Subject)Random.Shared.Next(subjNum);
+            SubjectB = (Subject)(((int)SubjectA + 1 + Random.Shared.Next(subjNum - 1)) % subjNum); // constraints: A != B
         }
     }
 
-    public void doClass(int day, Student student)
+    public void DoClass(int day, Student student)
     {
-        student.DoDay(day); // decides to skip or not to skip
         bool isQuestioned = rule.Decide(day, student, this);
-        if (!isQuestioned) return;
+        if (!isQuestioned)
+        {
+            student.DaysWasAsked[day, (int)Subject] = false;
+            return;
+        }
 
-        if (!student.DaysPresent[day, (int)subject])
+        if (!student.DaysPresent[day, (int)Subject])
         {
             // drop out
             student.Satisfaction = 0;
+            student.LastSubject = Subject;
         }
-        student.DaysWasAsked[day, (int)subject] = true;
+        student.DaysWasAsked[day, (int)Subject] = true;
     }
 }

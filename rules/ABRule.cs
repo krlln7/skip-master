@@ -1,15 +1,11 @@
 class ABRule : IRule
 {
-    public bool Decide(int day, Student student, Lesson klass)
+    public bool Decide(int day, IReadOnlyStudentHistory history, Lesson klass)
     {
         if (day == 0) return false;
 
-        Subject subjA = klass.subjectA;
-        Subject subjB = klass.subjectB;
-
-
-        bool askedA = (bool)student.DaysWasAsked[day - 1, (int)subjA].GetValueOrDefault(false);
-        bool askedB = (bool)student.DaysWasAsked[day - 1, (int)subjB].GetValueOrDefault(false);
+        bool askedA = history.WasAsked(day - 1, klass.SubjectA).GetValueOrDefault(false);
+        bool askedB = history.WasAsked(day - 1, klass.SubjectB).GetValueOrDefault(false);
 
         if (askedA && !askedB)
         {

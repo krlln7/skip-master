@@ -1,7 +1,7 @@
 
 class University
 {
-    static public int SemesterDays { get => 100; }
+    static public int SemesterDays { get; set; }
     public Lesson[] Classes { get; set; }
 
     public int Day { get; private set; }
@@ -10,11 +10,18 @@ class University
 
     public Student Student { get; private set; }
 
-    public University(IStrategy strategy)
+    public University(IStrategy strategy, int semDays = 100, Lesson[]? classes = null)
     {
-        Classes = Enum.GetValues<Subject>()
-                  .Select(subject => new Lesson(subject))
-                  .ToArray();
+        if (classes == null)
+        {
+            Classes = Enum.GetValues<Subject>()
+                      .Select(subject => new Lesson(subject))
+                      .ToArray();
+        }
+        else
+        {
+            Classes = classes;
+        }
 
         Student = new Student(strategy);
     }
@@ -24,14 +31,15 @@ class University
     {
         if (DroppedOut || Finished) return false;
 
-        for (int l = 0; l < 6; l++)
+        Student.DoDay(Day); // decides to skip or not to skip
+
+        for (int l = 0; l < Enum.GetValues<Subject>().Length; l++)
         {
-            Classes[l].doClass(Day, Student);
+            Classes[l].DoClass(Day, Student);
 
             //drop out
             if (Student.Satisfaction == 0)
             {
-                Console.WriteLine(Enum.GetName(typeof(Subject), l) + " killed Student");
                 DroppedOut = true;
                 return false;
             }

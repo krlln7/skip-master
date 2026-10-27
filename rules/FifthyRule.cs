@@ -1,6 +1,6 @@
 class FifthyRule : IRule
 {
-    public bool Decide(int day, Student student, Lesson klass)
+    public bool Decide(int day, IReadOnlyStudentHistory history, Lesson klass)
     {
         Random rand = new Random();
         double decision = rand.NextDouble();
