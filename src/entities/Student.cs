@@ -1,6 +1,3 @@
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("proj_tests")]
 class Student : IReadOnlyStudentHistory
 {
     const byte SatisfactionPoint = 1;

@@ -25,4 +25,8 @@
     <EmbeddedResource Remove="proj_tests/**" />
   </ItemGroup>
 
+   <ItemGroup>
+    <InternalsVisibleTo Include="proj_tests" />
+  </ItemGroup>
+
 </Project>
