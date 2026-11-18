@@ -1,8 +1,10 @@
 class FifthyRule : IRule
 {
-    public bool Decide(int day, IReadOnlyStudentHistory history, Lesson klass)
-    {
-        double decision = Random.Shared.NextDouble();
-        return (decision > 0.5f) ? true : false;
-    }
+    private readonly IRandomSource _random;
+
+    public FifthyRule() : this(new TrueRandomSource()) { }
+    public FifthyRule(IRandomSource random) => _random = random;
+
+    public bool Decide(int day, IReadOnlyStudentHistory history, Lesson lesson)
+        => _random.NextDouble() > 0.5;
 }

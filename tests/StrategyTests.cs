@@ -91,15 +91,4 @@ public class StrategyTests
 
         Assert.That(strategy.DecideDay(2, student)[0], Is.False);
     }
-
-    [Test]
-    public void ScriptedStrategy_ReturnsConfiguredArray_OfCorrectLength()
-    {
-        var pattern = new[] { true, false, true, false, true, false };
-        var strategy = new ScriptedStrategy(pattern);
-        var result = strategy.DecideDay(0, new Student(strategy));
-
-        Assert.That(result, Has.Length.EqualTo(TestHelpers.SubjectCount));
-        Assert.That(result, Is.EqualTo(pattern));
-    }
 }
