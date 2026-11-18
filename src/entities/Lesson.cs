@@ -15,18 +15,34 @@ class Lesson
     public required Subject Subject { get; init; }
 
     [SetsRequiredMembers]
-    public Lesson(Subject subj)
+    public Lesson(Subject subject, IRule rule, Subject subjectA, Subject subjectB)
     {
-        var ruleType = TypesResolver.ResolveRandomly<IRule>();
-        rule = (IRule)Activator.CreateInstance(ruleType)!;
+        Subject = subject;
+        this.rule = rule;
+        SubjectA = subjectA;
+        SubjectB = subjectB;
+    }
 
+    [SetsRequiredMembers]
+    public Lesson(Subject subj) : this(subj, new TrueRandomSource(), explicitRule: null) { }
+
+    [SetsRequiredMembers]
+    public Lesson(Subject subj, IRandomSource random, IRule? explicitRule = null)
+    {
         Subject = subj;
-
+        rule = explicitRule
+            ?? (IRule)Activator.CreateInstance(TypesResolver.ResolveRandomly<IRule>(random))!;
+        this.Subject = Subject;
         if (rule is ABRule || rule is ARule)
         {
-            int subjNum = Enum.GetValues<Subject>().Length;
-            SubjectA = (Subject)Random.Shared.Next(subjNum);
-            SubjectB = (Subject)(((int)SubjectA + 1 + Random.Shared.Next(subjNum - 1)) % subjNum); // constraints: A != B
+            int n = Enum.GetValues<Subject>().Length;
+            SubjectA = (Subject)random.Next(0, n);
+            SubjectB = (Subject)(((int)SubjectA + 1 + random.Next(0, n - 1)) % n);
+        }
+        else
+        {
+            SubjectA = subj;
+            SubjectB = subj;
         }
     }
 

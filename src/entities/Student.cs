@@ -27,7 +27,6 @@ class Student : IReadOnlyStudentHistory
 
         for (int i = 0; i < skipChoice.Length; i++)
         {
-            // Console.WriteLine("I will " + "[" + skipChoice[i] + "] to " + (Subject)i);
             if (!skipChoice[i])
             {
                 Satisfaction += SatisfactionPoint;

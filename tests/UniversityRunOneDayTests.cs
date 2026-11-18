@@ -87,4 +87,47 @@ public class UniversityRunOneDayTests
         Assert.That(uni.Student.DaysWasAsked[1, 0], Is.False);
         Assert.That(uni.Student.DaysWasAsked[0, 0], Is.True);
     }
+
+    private static Lesson[] BuildLessons(IRule rule)
+        => Enum.GetValues<Subject>()
+            .Select(s => new Lesson(s, new FakeRandomSource(), explicitRule: rule))
+            .ToArray();
+
+    [Test]
+    public void SameSeed_SameOutcome()
+    {
+        var lessons1 = BuildLessons(new FixedRule { Result = false });
+        var lessons2 = BuildLessons(new FixedRule { Result = false });
+
+        var u1 = new University(new NoSkipStrategy(), semDays: 5, classes: lessons1);
+        var u2 = new University(new NoSkipStrategy(), semDays: 5, classes: lessons2);
+
+        while (u1.RunOneDay()) { }
+        while (u2.RunOneDay()) { }
+
+        Assert.That(u1.Day, Is.EqualTo(u2.Day));
+        Assert.That(u1.Student.Satisfaction, Is.EqualTo(u2.Student.Satisfaction));
+        Assert.That(u1.DroppedOut, Is.EqualTo(u2.DroppedOut));
+    }
+
+    [Test]
+    public void SkipAll_WithAlwaysAskRule_DropsOutOnDay0()
+    {
+        var lessons = TestHelpers.CreateLessons(new FixedRule { Result = true });
+        var uni = new University(FixedStrategy.SkipAll(), semDays: 10, classes: lessons);
+
+        Assert.That(uni.RunOneDay(), Is.False);
+        Assert.That(uni.DroppedOut, Is.True);
+    }
+
+    [Test]
+    public void AttendAll_WithAlwaysAskRule_DoesNotDropOut()
+    {
+        var lessons = TestHelpers.CreateLessons(new FixedRule { Result = true });
+        var uni = new University(FixedStrategy.AttendAll(), semDays: 5, classes: lessons);
+
+        while (uni.RunOneDay()) { }
+        Assert.That(uni.DroppedOut, Is.False);
+        Assert.That(uni.Finished, Is.True);
+    }
 }
