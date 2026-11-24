@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 class Program
 {
@@ -9,11 +11,15 @@ class Program
         HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
         builder.Services.AddHostedService<UniversityService>();
         builder.Services.AddSingleton<IProgressReporter, LoggerProgressReporter>();
-
-        var strategyName = builder.Configuration["Student:Strategy"] ?? "NoSkipStrategy";
-        var strategyType = TypesResolver.ResolveByName<IStrategy>(strategyName);
-        builder.Services.AddSingleton(typeof(IStrategy), strategyType);
-        builder.Services.AddSingleton<University>();
+        builder.Services.AddDbContext<UniversityDbContext>(o =>
+            o.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+        builder.Services.AddScoped<SimulationRepository>();
+        builder.Services.AddSingleton<IStrategy>(_ =>
+        {
+            var name = builder.Configuration["Student:Strategy"] ?? "NoSkipStrategy";
+            var type = TypesResolver.ResolveByName<IStrategy>(name);
+            return (IStrategy)Activator.CreateInstance(type)!;
+        });
 
         var host = builder.Build();
         try

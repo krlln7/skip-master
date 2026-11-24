@@ -1,7 +1,6 @@
-
 class University
 {
-    static public int SemesterDays { get; set; }
+    public int SemesterDays { get; set; }
     public Lesson[] Classes { get; set; }
 
     public int Day { get; private set; }
@@ -15,7 +14,7 @@ class University
         if (classes == null)
         {
             Classes = Enum.GetValues<Subject>()
-                      .Select(subject => new Lesson(subject))
+                      .Select(subject => new Lesson(subject, new TrueRandomSource()))
                       .ToArray();
         }
         else
@@ -26,6 +25,27 @@ class University
         SemesterDays = semDays;
 
         Student = new Student(strategy, semDays);
+    }
+
+    internal University(Student student, Lesson[] classes, int semesterDays)
+    {
+        Student = student;
+        Classes = classes;
+        SemesterDays = semesterDays;
+    }
+
+    public static University RestoreFrom(
+        Student student, Lesson[] classes,
+        int currentDay, int semesterDays,
+        bool droppedOut, bool finished)
+    {
+        var uni = new University(student, classes, semesterDays)
+        {
+            Day = currentDay,
+            DroppedOut = droppedOut,
+            Finished = finished
+        };
+        return uni;
     }
 
     // dropped out or not today?

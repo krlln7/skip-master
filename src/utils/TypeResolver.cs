@@ -19,11 +19,13 @@ public class TypesResolver
                 $"Type '{name}' implementing {typeof(T).Name} not found. " +
                 $"Available: {string.Join(", ", types.Select(t => t.Name))}");
     }
-    public static Type ResolveRandomly<T>()
+    public static Type ResolveRandomly<T>() => ResolveRandomly<T>(new TrueRandomSource());
+
+    public static Type ResolveRandomly<T>(IRandomSource random)
     {
-        Type[] types = ResolveAll<T>();
-        if (types.Length == 0)
-            throw new InvalidOperationException($"No implementations of {typeof(T).Name} found.");
-        return types[Random.Shared.Next(types.Length)];
+        var types = typeof(T).Assembly.GetTypes()
+            .Where(x => typeof(T).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+            .OrderBy(x => x.Name).ToArray();
+        return types[random.Next(0, types.Length)];
     }
 }
