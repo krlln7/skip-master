@@ -37,14 +37,46 @@ public class ARuleTests
     }
 
     [Test]
-    public void ARule_DoesNotDependOnStudent()
+    public void ARule_AskedYesterday_AskedToday_RegardlessOfStudent()
     {
         var lesson = CreateLessonWithA((Subject)0);
+
         var attend = new Student(FixedStrategy.AttendAll());
         var skip = new Student(FixedStrategy.SkipAll());
 
-        for (int day = 0; day < 100; day++)
-            Assert.That(lesson.rule.Decide(day, attend, lesson),
-                        Is.EqualTo(lesson.rule.Decide(day, skip, lesson)));
+        attend.DaysWasAsked[0, 0] = true;
+        skip.DaysWasAsked[0, 0] = true;
+
+        attend.DaysPresent[0, 0] = true;
+        skip.DaysPresent[0, 0] = false;
+
+        var r1 = lesson.rule.Decide(1, attend, lesson);
+        var r2 = lesson.rule.Decide(1, skip, lesson);
+
+        Assert.That(r1, Is.True, "attend: must be asked");
+        Assert.That(r2, Is.True, "skip: must be asked");
+        Assert.That(r2, Is.EqualTo(r1), "must not depend on student");
+    }
+
+    [Test]
+    public void ARule_NotAskedYesterday_NotAskedToday_RegardlessOfStudent()
+    {
+        var lesson = CreateLessonWithA((Subject)0);
+
+        var attend = new Student(FixedStrategy.AttendAll());
+        var skip = new Student(FixedStrategy.SkipAll());
+
+        attend.DaysWasAsked[0, 0] = false;
+        skip.DaysWasAsked[0, 0] = false;
+
+        attend.DaysPresent[0, 0] = true;
+        skip.DaysPresent[0, 0] = false;
+
+        var r1 = lesson.rule.Decide(1, attend, lesson);
+        var r2 = lesson.rule.Decide(1, skip, lesson);
+
+        Assert.That(r1, Is.False, "attend: should not be asked");
+        Assert.That(r2, Is.False, "skip: should not be asked");
+        Assert.That(r2, Is.EqualTo(r1), "must not depend on student");
     }
 }

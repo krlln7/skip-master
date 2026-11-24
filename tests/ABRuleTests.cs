@@ -42,15 +42,32 @@ public class ABRuleTests
     }
 
 
-    [Test]
-    public void ABRule_DoesNotDependOnStudent()
+    [TestCase(true, true, TestName = "ABRule independence: A=yes B=yes")]
+    [TestCase(true, false, TestName = "ABRule independence: A=yes B=no")]
+    [TestCase(false, true, TestName = "ABRule independence: A=no  B=yes")]
+    [TestCase(false, false, TestName = "ABRule independence: A=no  B=no")]
+    public void ABRule_DoesNotDependOnStudent_AllFourCombinations(bool aAsked, bool bAsked)
     {
-        var lesson = CreateLessonWithAB((Subject)0, (Subject)3);
+        var lesson = CreateLessonWithAB((Subject)1, (Subject)4);
+
         var attend = new Student(FixedStrategy.AttendAll());
         var skip = new Student(FixedStrategy.SkipAll());
 
-        for (int day = 0; day < 100; day++)
-            Assert.That(lesson.rule.Decide(day, attend, lesson),
-                        Is.EqualTo(lesson.rule.Decide(day, skip, lesson)));
+        foreach (var s in new[] { attend, skip })
+        {
+            s.DaysWasAsked[0, (int)lesson.SubjectA] = aAsked;
+            s.DaysWasAsked[0, (int)lesson.SubjectB] = bAsked;
+        }
+
+        attend.DaysPresent[0, (int)lesson.SubjectA] = true;
+        attend.DaysPresent[0, (int)lesson.SubjectB] = true;
+        skip.DaysPresent[0, (int)lesson.SubjectA] = false;
+        skip.DaysPresent[0, (int)lesson.SubjectB] = false;
+
+        var r1 = lesson.rule.Decide(1, attend, lesson);
+        var r2 = lesson.rule.Decide(1, skip, lesson);
+
+        Assert.That(r2, Is.EqualTo(r1),
+            $"A asked yesterday: {aAsked}, B asked yesterday: {bAsked} - must not depend on student");
     }
 }

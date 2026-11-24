@@ -116,7 +116,7 @@ class SimulationRepository
 
     public Task<Guid?> FindUnfinishedAsync(CancellationToken ct = default) =>
         _db.Sessions
-           .Where(s => !s.IsFinished)
+           .Where(s => !s.IsFinished && !s.IsDroppedOut)
            .OrderByDescending(s => s.StartedAt)
            .Select(s => (Guid?)s.Id)
            .FirstOrDefaultAsync(ct);

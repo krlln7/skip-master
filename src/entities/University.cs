@@ -1,6 +1,6 @@
 class University
 {
-    static public int SemesterDays { get; set; }
+    public int SemesterDays { get; set; }
     public Lesson[] Classes { get; set; }
 
     public int Day { get; private set; }
